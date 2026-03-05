@@ -1,5 +1,7 @@
 import { supabase, Profile } from "@/lib/supabase";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+import ShareSection from "./ShareSection";
 
 const LINK_CONFIG: {
   key: keyof Profile;
@@ -34,6 +36,10 @@ export default async function ProfilePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const headersList = await headers();
+  const host = headersList.get("host") ?? "localhost:3000";
+  const protocol = host.includes("localhost") ? "http" : "https";
+  const profileUrl = `${protocol}://${host}/profile/${id}`;
 
   const { data, error } = await supabase
     .from("profiles")
@@ -75,6 +81,8 @@ export default async function ProfilePage({
             </a>
           ))}
         </div>
+
+        <ShareSection profileUrl={profileUrl} />
 
         <p className="text-center text-slate-600 text-xs mt-10">
           Made with <a href="/" className="text-indigo-400 hover:underline">ShareMe</a>
